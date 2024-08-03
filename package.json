@@ -4,13 +4,16 @@
   "description": "You will need to create an env.json file with following structure:\r {\r \t\"user\": \"name of user\",\r \t\"host\": \"host (for testing just go with localhost)\",\r \t\"database\": \"name of db\",\r \t\"password\": \"password DO NOT LEAK THIS\",\r \t\"port\": 5432\r }",
   "main": "index.js",
   "scripts": {
-    "start":  "cd app && node server.js"
+    "start": "cd app && node server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "cookie-parser": "^1.4.6",
+    "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "express-session": "^1.18.0",
     "pg": "^8.12.0"
   }
 }
