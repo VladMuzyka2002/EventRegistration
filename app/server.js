@@ -1,6 +1,8 @@
 const pg = require("pg");
 const express = require("express");
 const app = express();
+const cookieParser = require("cookie-parser");
+const session = require('express-session');
 
 const port = 3000;
 const hostname = "localhost";
@@ -13,7 +15,22 @@ pool.connect().then(function () {
 });
 app.use(express.json());
 app.use(express.static("public"));
+app.use(cookieParser());
 
+app.use(session({
+  secret: env.session_key,
+  saveUninitialized: true,
+  resave: true
+}));
+
+app.use('/login', function(req, res){
+  res.cookie('user', user, {
+    httpOnly: true,
+    secure: false
+  });
+
+  res.redirect('/home.html');
+});
 
 app.get('/publicevents', async (req, res) => {
   const userId = req.params.id;
@@ -30,5 +47,5 @@ app.get('/publicevents', async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Server running at http://${hostname}}:${port}`);
+  console.log(`Server running at http://${hostname}:${port}`);
 });
