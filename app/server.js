@@ -40,7 +40,8 @@ app.post('/createEvent', async (req, res) => {
     console.error('Error executing query:', err.message, err.stack);
     res.status(500).json({ error: err.message });
   }
-  
+});
+
 app.use(session({
   secret: env.session_key,
   saveUninitialized: true,
