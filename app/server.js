@@ -2,6 +2,8 @@ const pg = require("pg");
 const express = require("express");
 const path = require("path");
 const app = express();
+const cookieParser = require("cookie-parser");
+const session = require('express-session');
 
 const port = 3000;
 const hostname = "localhost";
@@ -16,25 +18,40 @@ pool.connect().then(function () {
 });
 
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static("public"));
+app.use(cookieParser());
 
 app.post('/createEvent', async (req, res) => {
   const { eventName, eventDate, eventTime, eventDescription, isPrivate, ytLink, adminId, address, created_at } = req.body;
 
   try {
-    console.log("Before");
-    console.log(eventName, eventDate, eventTime, eventDescription, isPrivate, ytLink, adminId, address, created_at);
+    // console.log("Before");
+    // console.log(eventName, eventDate, eventTime, eventDescription, isPrivate, ytLink, adminId, address, created_at);
     const result = await pool.query(
       `insert into events("isPrivate", "ytLink", "adminId", "eventName", "description", created_at, address, event_date)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8);`,
       [isPrivate, ytLink, adminId, eventName, eventDescription, created_at, address, eventDate]
     );
-    console.log("After");
+    // console.log("After");
     res.status(201).json(result.rows[0]);
   } catch (err) {
     console.error('Error executing query:', err.message, err.stack);
     res.status(500).json({ error: err.message });
   }
+  
+app.use(session({
+  secret: env.session_key,
+  saveUninitialized: true,
+  resave: true
+}));
+
+app.use('/login', function(req, res){
+  res.cookie('user', user, {
+    httpOnly: true,
+    secure: false
+  });
+
+  res.redirect('/home.html');
 });
 
 app.get('/publicevents', async (req, res) => {
