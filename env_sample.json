@@ -1,0 +1,8 @@
+{
+    "user": "name of user",
+    "host": "host (for testing just go with localhost)",
+    "database": "name of db",
+    "password": "password DO NOT LEAK THIS",
+    "session_key": "session key for handling sessions",
+    "port": 5432
+}
