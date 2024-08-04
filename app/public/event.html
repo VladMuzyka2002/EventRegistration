@@ -1,3 +1,4 @@
+<!-- event.html -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -17,8 +18,70 @@
 
   <h2>This is the events page</h2>
 
-<script>
+  <button id="createEventBtn">Create Event</button>
 
+  <div id="eventForm" style="display:none;">
+    <h3>Create Event</h3>
+    <form id="eventCreationForm">
+      <label for="eventName">Event Name:</label>
+      <input type="text" id="eventName" name="eventName" required><br><br>
+      <label for="eventDate">Event Date:</label>
+      <input type="date" id="eventDate" name="eventDate" required><br><br>
+      <label for="eventTime">Event Time:</label>
+      <input type="time" id="eventTime" name="eventTime" required><br><br>
+      <label for="eventDescription">Event Description:</label><br>
+      <textarea id="eventDescription" name="eventDescription" rows="4" cols="50" required></textarea><br><br>
+      <input type="submit" value="Submit">
+    </form>
+  </div>
+
+  <h3>Upcoming Events</h3>
+  <ul id="eventList"></ul>
+
+<script>
+document.getElementById('createEventBtn').addEventListener('click', function() {
+  document.getElementById('eventForm').style.display = 'block';
+});
+
+document.getElementById('eventCreationForm').addEventListener('submit', async function(event) {
+  event.preventDefault();
+
+  const eventName = document.getElementById('eventName').value;
+  const eventDate = document.getElementById('eventDate').value;
+  const eventTime = document.getElementById('eventTime').value;
+  const eventDescription = document.getElementById('eventDescription').value;
+
+  const eventDetails = {
+    eventName: eventName,
+    eventDate: eventDate,
+    eventTime: eventTime,
+    eventDescription: eventDescription,
+    isPrivate: false, 
+    ytLink: "", 
+    adminId: 1, 
+    address: "", 
+    created_at: new Date().toISOString()
+  };
+
+  const response = await fetch('/createEvent', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(eventDetails)
+  });
+
+  if (response.ok) {
+    const newEvent = document.createElement('li');
+    newEvent.innerHTML = `<strong>${eventName}</strong> - ${eventDate} at ${eventTime}<br>${eventDescription}`;
+    document.getElementById('eventList').appendChild(newEvent);
+  } else {
+    alert('Failed to create event');
+  }
+
+  document.getElementById('eventForm').style.display = 'none';
+  document.getElementById('eventCreationForm').reset();
+});
 </script>
 
 </body>
