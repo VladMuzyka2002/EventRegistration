@@ -4,6 +4,8 @@ const path = require("path");
 const app = express();
 const cookieParser = require("cookie-parser");
 const session = require('express-session');
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 const port = 3000;
 const hostname = "localhost";
@@ -45,13 +47,43 @@ app.use(session({
   resave: true
 }));
 
-app.use('/login', function(req, res){
-  res.cookie('user', user, {
-    httpOnly: true,
-    secure: false
-  });
+// User registration endpoint
+app.post('/register', async (req, res) => {
+  const { username, email, password } = req.body;
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const result = await pool.query('INSERT INTO users (username, email, hashedPassword) VALUES ($1, $2, $3) RETURNING id', [username, email, hashedPassword]);
+    res.status(201).json({ userId: result.rows[0].id });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
-  res.redirect('/home.html');
+// User login endpoint
+app.post('/login', async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+    if (result.rows.length > 0) {
+      const user = result.rows[0];
+      const match = await bcrypt.compare(password, user.hashedPassword);
+      if (match) {
+        const token = jwt.sign({ userId: user.id }, env.session_key, { expiresIn: '1h' });
+        res.cookie('token', token, {
+          httpOnly: true,
+          secure: false
+        });
+        await pool.query('UPDATE users SET sessionToken = $1 WHERE id = $2', [token, user.id]);
+        res.redirect('/home.html');
+      } else {
+        res.status(401).json({ error: 'Invalid password' });
+      }
+    } else {
+      res.status(404).json({ error: 'User not found' });
+    }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 app.get('/publicevents', async (req, res) => {
