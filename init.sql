@@ -1,3 +1,9 @@
+-- db shtuff
+DROP DATABASE IF EXISTS eventdb;
+CREATE DATABASE eventdb;
+\c eventdb;
+
+-- table shtuff
 CREATE TABLE IF NOT EXISTS "users" (
 	"id" bigint GENERATED ALWAYS AS IDENTITY NOT NULL UNIQUE,
 	"email" text UNIQUE,
