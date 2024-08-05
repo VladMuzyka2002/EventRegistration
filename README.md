@@ -1,4 +1,4 @@
-You will need to create an env.json file with following structure:
+You will need to create an env.json file with following structure (a sample is provided in env_sample.json):
 ```json
 {
 	"user": "name of user",
@@ -9,3 +9,4 @@ You will need to create an env.json file with following structure:
 	"port": 5432
 }
 ```
+You must also set up a postgres database on your local machine or your VPS, and then use the provided init.sql file to set up the basic structure for the database.
